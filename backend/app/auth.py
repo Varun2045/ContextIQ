@@ -5,11 +5,12 @@ from passlib.context import CryptContext
 from jose import jwt, JWTError
 
 from datetime import datetime, timedelta
+import os
 
 from app.db.database import cur
 
 
-SECRET_KEY = "super-secret-key-change-this"
+SECRET_KEY = os.environ["JWT_SECRET"]
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 

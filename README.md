@@ -2,11 +2,11 @@
 
 ## Overview
 
-Retrievium is a production-oriented Retrieval-Augmented Generation (RAG) platform that enables users to upload documents, perform semantic search, and receive context-aware AI-generated responses.
+Retrievium is a production-grade Retrieval-Augmented Generation (RAG) platform engineered for secure document ingestion, semantic retrieval, and AI-powered question answering.
 
-The system combines modern retrieval techniques, vector databases, secure authentication, and per-user document isolation to deliver a scalable knowledge retrieval experience.
+The platform enables users to upload PDF documents, automatically extract and chunk content, generate vector embeddings using OpenAI embedding models, and perform hybrid retrieval combining semantic similarity search with lexical relevance scoring. Retrieved context is then supplied to a Large Language Model to generate grounded, context-aware responses.
 
-Unlike basic RAG demos, Retrievium implements end-to-end document ownership enforcement, ensuring users can only retrieve information from documents they have uploaded themselves.
+Unlike traditional RAG demos, Retrievium implements JWT-based authentication and per-user document ownership enforcement, ensuring that users can only retrieve information from documents they have personally uploaded.
 
 ---
 
@@ -26,6 +26,7 @@ FastAPI Backend
  ├── Chunking Pipeline
  ├── Embedding Generation
  ├── Hybrid Retrieval
+ ├── Reranking
  └── Response Generation
  │
  ▼
@@ -38,42 +39,41 @@ PostgreSQL + pgvector (Supabase)
 
 ### Authentication & Security
 
-- JWT-based authentication
-- Secure password hashing
-- Protected API endpoints
-- User session persistence
-- Route-level access control
+- JWT-based Authentication
+- Secure Password Hashing
+- Protected API Endpoints
+- Route-Level Access Control
+- Session Persistence
 
 ### Document Processing
 
-- PDF upload support
-- Automated text extraction
-- Recursive document chunking
-- Metadata preservation
-- Scalable ingestion pipeline
+- PDF Upload Support
+- Automated Text Extraction
+- Recursive Document Chunking
+- Metadata Preservation
+- Scalable Ingestion Pipeline
 
 ### Retrieval Pipeline
 
-- OpenAI embedding generation
-- pgvector vector storage
-- Semantic similarity search
-- Hybrid retrieval architecture
-- Retrieval reranking
-- Context-aware response generation
+- OpenAI Embedding Generation
+- pgvector Semantic Search
+- Hybrid Retrieval (Vector + Lexical)
+- Retrieval Reranking
+- Context-Aware Response Generation
 
 ### Multi-Tenant Isolation
 
-- Per-user document ownership
-- Ownership-aware retrieval
-- Protected document access
-- Secure user-level data separation
+- Per-User Document Ownership
+- Ownership-Aware Retrieval
+- User-Level Data Separation
+- Secure Document Access Control
 
 ### Evaluation & Observability
 
-- Retrieval evaluation utilities
-- Relevance testing dataset
-- Metrics tracking
-- Modular retrieval architecture
+- Retrieval Evaluation Utilities
+- Relevance Testing Dataset
+- Modular Retrieval Architecture
+- Retrieval Performance Analysis
 
 ---
 
@@ -81,30 +81,21 @@ PostgreSQL + pgvector (Supabase)
 
 ### Hybrid Retrieval
 
-Retrievium combines:
-
-- Dense vector retrieval
-- Lexical relevance matching
-
-This improves retrieval quality compared to traditional vector-only search systems.
+Retrievium combines dense vector retrieval with lexical relevance matching to improve retrieval quality beyond traditional vector-only search systems.
 
 ### Ownership-Aware Search
 
-Every document chunk is associated with a user identifier.
-
-During retrieval:
+Each document chunk is associated with a specific user identifier.
 
 ```sql
 WHERE owner_id = current_user_id
 ```
 
-This guarantees that users can only access their own document corpus.
+This guarantees strict user-level document isolation and prevents cross-user data exposure.
 
 ### Semantic Search Infrastructure
 
-Embeddings are generated using OpenAI models and stored in PostgreSQL using the pgvector extension.
-
-Similarity search is performed directly inside the database using vector distance operators.
+Embeddings are generated using OpenAI models and stored inside PostgreSQL using pgvector. Similarity search is executed directly within the database using vector distance operators for efficient semantic retrieval.
 
 ---
 
@@ -133,78 +124,154 @@ Similarity search is performed directly inside the database using vector distanc
 - Sentence Transformers
 - Hybrid Search
 - Semantic Retrieval
+- Retrieval Reranking
 
 ### Security
 
 - JWT Authentication
 - Password Hashing
 - Protected Routes
-- User Ownership Enforcement
+- Ownership-Based Access Control
 
 ---
 
-## Project Structure
+## System Capabilities
+
+- PDF Document Ingestion
+- OpenAI Embedding Generation
+- pgvector Similarity Search
+- Hybrid Semantic-Lexical Retrieval
+- JWT-Protected APIs
+- Per-User Document Isolation
+- Retrieval Reranking Pipeline
+- FastAPI REST Architecture
+- Supabase PostgreSQL Backend
+- End-to-End RAG Workflow
+
+---
+
+## Run Locally
+
+### Backend
+
+Create and activate a virtual environment:
+
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Create `backend/app/.env` and configure:
+
+```env
+OPENAI_API_KEY=your_openai_api_key
+DATABASE_URL=your_database_url
+JWT_SECRET=your_jwt_secret
+```
+
+Start the FastAPI server:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Backend API:
 
 ```text
-Retrievium/
-│
-├── backend/
-│   ├── app/
-│   │   ├── auth.py
-│   │   ├── ingestion/
-│   │   ├── retrieval/
-│   │   ├── services/
-│   │   └── db/
-│   │
-│   └── evaluation/
-│
-├── frontend/
-│   ├── app/
-│   ├── components/
-│   └── services/
-│
-├── docs/
-└── infrastructure/
+http://127.0.0.1:8000
+```
+
+Swagger Documentation:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+---
+
+### Frontend
+
+Navigate to the frontend directory:
+
+```bash
+cd frontend
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create `.env.local`:
+
+```env
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Frontend:
+
+```text
+http://127.0.0.1:3000
 ```
 
 ---
 
 ## Example Workflow
 
-1. User uploads a PDF
-2. Text is extracted and chunked
-3. Embeddings are generated
-4. Chunks are stored in PostgreSQL + pgvector
-5. User submits a query
-6. Hybrid retrieval finds relevant chunks
-7. Context is passed to the LLM
-8. Grounded response is generated
+1. User creates an account
+2. User logs in via JWT authentication
+3. PDF documents are uploaded
+4. Text is extracted and chunked
+5. OpenAI embeddings are generated
+6. Chunks are stored in PostgreSQL + pgvector
+7. User submits a natural language query
+8. Hybrid retrieval identifies relevant context
+9. Retrieved context is supplied to the LLM
+10. Grounded response is generated
 
 ---
 
 ## Engineering Challenges Solved
 
-- Secure multi-user authentication
-- Vector database integration
-- Hybrid retrieval implementation
-- Per-user document ownership
-- End-to-end RAG pipeline orchestration
-- Production-oriented API architecture
-- Scalable document ingestion workflow
+- Secure Multi-User Authentication
+- Vector Database Integration
+- Hybrid Retrieval Implementation
+- Per-User Document Ownership Enforcement
+- End-to-End RAG Pipeline Orchestration
+- Semantic Search Infrastructure
+- Production-Oriented API Design
+- Scalable Document Processing Workflow
 
 ---
 
 ## Future Improvements
 
-- Streaming responses
-- Conversation memory
-- Citation generation
-- Advanced reranking models
-- Multi-document collections
-- Admin analytics dashboard
-- Kubernetes deployment
-- CI/CD automation
+- Streaming Responses
+- Conversation Memory
+- Citation Generation
+- Advanced Cross-Encoder Reranking
+- Multi-Document Collections
+- Analytics Dashboard
+- CI/CD Pipelines
+- Kubernetes Deployment
 
 ---
 
-Production-grade RAG platform built using FastAPI, Next.js, OpenAI Embeddings, PostgreSQL, pgvector, JWT Authentication, and Hybrid Retrieval.
+## Author
+
+**Neha Damani**
+
+Production-grade Retrieval-Augmented Generation (RAG) platform featuring OpenAI embedding generation, pgvector similarity search, hybrid semantic-lexical retrieval, JWT authentication, ownership-aware access control, document chunking pipelines, retrieval reranking, FastAPI backend services, Next.js frontend architecture, and PostgreSQL-backed vector retrieval infrastructure.
