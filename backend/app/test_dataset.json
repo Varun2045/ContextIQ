@@ -1,0 +1,14 @@
+[
+  {
+    "query": "What is LoRaWAN?",
+    "expected_chunk_keywords": ["lorawan", "long range"]
+  },
+  {
+    "query": "What is the temperature threshold?",
+    "expected_chunk_keywords": ["temperature", "threshold"]
+  },
+  {
+    "query": "What device EUI is mentioned?",
+    "expected_chunk_keywords": ["device_eui"]
+  }
+]
