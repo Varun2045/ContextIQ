@@ -1,5 +1,8 @@
-import fitz
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from pypdf import PdfReader
+
+
+CHUNK_SIZE = 500
+CHUNK_OVERLAP = 100
 
 
 def extract_text_from_pdf(file_path: str):
@@ -7,14 +10,12 @@ def extract_text_from_pdf(file_path: str):
     Extract text page-by-page from PDF
     """
 
-    doc = fitz.open(file_path)
+    reader = PdfReader(file_path)
 
     pages = []
 
-    for page_num in range(len(doc)):
-        page = doc.load_page(page_num)
-
-        text = page.get_text()
+    for page_num, page in enumerate(reader.pages):
+        text = page.extract_text() or ""
 
         pages.append({
             "page_number": page_num + 1,
@@ -29,21 +30,51 @@ def chunk_text(pages):
     Chunk extracted text intelligently
     """
 
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=100,
-        separators=["\n\n", "\n", ".", " ", ""]
-    )
-
     chunks = []
 
     for page in pages:
-        split_chunks = splitter.split_text(page["text"])
+        page_chunks = split_text(
+            page["text"]
+        )
 
-        for chunk in split_chunks:
+        for chunk in page_chunks:
             chunks.append({
                 "page_number": page["page_number"],
                 "chunk_text": chunk
             })
+
+    return chunks
+
+
+def split_text(text):
+
+    normalized_text = " ".join(
+        text.split()
+    )
+
+    if not normalized_text:
+        return []
+
+    chunks = []
+    start = 0
+
+    while start < len(normalized_text):
+        end = min(
+            start + CHUNK_SIZE,
+            len(normalized_text)
+        )
+
+        chunk = normalized_text[start:end].strip()
+
+        if chunk:
+            chunks.append(chunk)
+
+        if end == len(normalized_text):
+            break
+
+        start = max(
+            end - CHUNK_OVERLAP,
+            start + 1
+        )
 
     return chunks

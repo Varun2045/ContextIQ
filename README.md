@@ -4,7 +4,7 @@
 
 Retrievium is a production-grade Retrieval-Augmented Generation (RAG) platform engineered for secure document ingestion, semantic retrieval, and AI-powered question answering.
 
-The platform enables users to upload PDF documents, automatically extract and chunk content, generate vector embeddings using Sentence Transformers, and perform hybrid retrieval combining semantic similarity search with lexical relevance scoring. Retrieved context is then supplied to a Groq-hosted Large Language Model to generate grounded, context-aware responses.
+The platform enables users to upload PDF documents, automatically extract and chunk content, generate lightweight hashing-based vector embeddings, and perform hybrid retrieval combining vector similarity with lexical BM25 relevance scoring. Retrieved context is then supplied to a Groq-hosted Large Language Model to generate grounded, context-aware responses.
 
 Unlike traditional RAG demos, Retrievium implements JWT-based authentication and per-user document ownership enforcement, ensuring that users can only retrieve information from documents they have personally uploaded.
 
@@ -24,9 +24,8 @@ FastAPI Backend
  ├── JWT Authentication
  ├── PDF Processing
  ├── Chunking Pipeline
- ├── Sentence Transformer Embeddings
+ ├── Lightweight Hashing Embeddings
  ├── Hybrid Retrieval
- ├── Reranking
  └── Groq Streaming Response Generation
  │
  ▼
@@ -56,10 +55,9 @@ PostgreSQL + pgvector (Supabase)
 
 ### Retrieval Pipeline
 
-- Sentence Transformer Embedding Generation
+- Lightweight Hashing Embedding Generation
 - pgvector Semantic Search
 - Hybrid Retrieval (Vector + Lexical)
-- Retrieval Reranking
 - Groq-Powered Streaming Response Generation
 
 ### Multi-Tenant Isolation
@@ -96,7 +94,7 @@ This guarantees strict user-level document isolation and prevents cross-user dat
 
 ### Semantic Search Infrastructure
 
-Embeddings are generated locally with Sentence Transformers and stored inside PostgreSQL using pgvector. Similarity search is executed directly within the database using vector distance operators for efficient semantic retrieval.
+Embeddings are generated locally with scikit-learn's `HashingVectorizer` and stored inside PostgreSQL using pgvector. Similarity search is executed directly within the database using vector distance operators, then combined with BM25 lexical scoring for lightweight retrieval that fits Render's free memory tier.
 
 ### Groq Response Generation
 
@@ -129,11 +127,10 @@ The upload API validates PDF uploads before indexing. It rejects non-PDF files, 
 
 ### AI & Retrieval
 
-- Sentence Transformers
+- scikit-learn HashingVectorizer
 - Groq
 - Hybrid Search
 - Semantic Retrieval
-- Retrieval Reranking
 
 ### Security
 
@@ -147,13 +144,12 @@ The upload API validates PDF uploads before indexing. It rejects non-PDF files, 
 ## System Capabilities
 
 - PDF Document Ingestion
-- Sentence Transformer Embedding Generation
+- Lightweight Hashing Embedding Generation
 - pgvector Similarity Search
 - Hybrid Semantic-Lexical Retrieval
 - Groq Streaming Answer Generation
 - JWT-Protected APIs
 - Per-User Document Isolation
-- Retrieval Reranking Pipeline
 - FastAPI REST Architecture
 - Supabase PostgreSQL Backend
 - End-to-End RAG Workflow
@@ -246,7 +242,7 @@ http://127.0.0.1:3000
 2. User logs in via JWT authentication
 3. PDF documents are uploaded and validated
 4. Text is extracted and chunked
-5. Sentence Transformer embeddings are generated
+5. Lightweight hashing embeddings are generated
 6. Chunks are stored in PostgreSQL + pgvector
 7. User submits a natural language query
 8. Hybrid retrieval identifies relevant context
@@ -275,7 +271,7 @@ http://127.0.0.1:3000
 - Streaming Responses
 - Conversation Memory
 - Citation Generation
-- Advanced Cross-Encoder Reranking
+- Managed embedding provider support
 - Multi-Document Collections
 - Analytics Dashboard
 - CI/CD Pipelines
@@ -287,4 +283,4 @@ http://127.0.0.1:3000
 
 **Neha Damani**
 
-Production-grade Retrieval-Augmented Generation (RAG) platform featuring Sentence Transformer embedding generation, Groq-powered streamed answers, pgvector similarity search, hybrid semantic-lexical retrieval, JWT authentication, ownership-aware access control, document chunking pipelines, retrieval reranking, FastAPI backend services, Next.js frontend architecture, and PostgreSQL-backed vector retrieval infrastructure.
+Production-grade Retrieval-Augmented Generation (RAG) platform featuring lightweight hashing-based embedding generation, Groq-powered streamed answers, pgvector similarity search, hybrid semantic-lexical retrieval, JWT authentication, ownership-aware access control, document chunking pipelines, FastAPI backend services, Next.js frontend architecture, and PostgreSQL-backed vector retrieval infrastructure.

@@ -1,12 +1,18 @@
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import HashingVectorizer
 
-# Load embedding model
-model = SentenceTransformer(
-    "all-MiniLM-L6-v2"
+VECTOR_DIMENSIONS = 384
+
+vectorizer = HashingVectorizer(
+    n_features=VECTOR_DIMENSIONS,
+    alternate_sign=False,
+    norm="l2"
 )
+
 
 def generate_embedding(text: str):
 
-    embedding = model.encode(text)
+    embedding = vectorizer.transform(
+        [text]
+    )
 
-    return embedding.tolist()
+    return embedding.toarray()[0].tolist()

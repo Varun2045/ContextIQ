@@ -1,7 +1,6 @@
 import time
 
 from rank_bm25 import BM25Okapi
-from sentence_transformers import CrossEncoder
 
 from app.db.database import cur
 from app.services.embedding_service import (
@@ -17,14 +16,6 @@ def log_timing(label, started_at):
         flush=True
     )
 
-
-# =========================
-# RERANKER
-# =========================
-
-reranker = CrossEncoder(
-    "cross-encoder/ms-marco-MiniLM-L-6-v2"
-)
 
 # =========================
 # HYBRID SEARCH
@@ -117,7 +108,12 @@ def hybrid_search(
 
         cur.execute(
             """
-            SELECT chunk_text
+            SELECT
+                id,
+                document_id,
+                chunk_text,
+                page_number,
+                filename
             FROM chunks
             WHERE owner_id = %s
             """,
@@ -130,7 +126,12 @@ def hybrid_search(
 
         cur.execute(
             """
-            SELECT chunk_text
+            SELECT
+                id,
+                document_id,
+                chunk_text,
+                page_number,
+                filename
             FROM chunks
             """
         )
@@ -143,7 +144,7 @@ def hybrid_search(
     )
 
     documents = [
-        row[0]
+        row[2]
         for row in all_chunks
     ]
 
@@ -165,13 +166,14 @@ def hybrid_search(
 
     log_timing("BM25", stage_start)
 
-    score_map = {
-        doc: float(score)
-        for doc, score in zip(
-            documents,
-            bm25_scores
-        )
-    }
+    score_map = {}
+
+    for row, score in zip(
+        all_chunks,
+        bm25_scores
+    ):
+
+        score_map[row[0]] = float(score)
 
     # =========================
     # HYBRID SCORING
@@ -189,7 +191,7 @@ def hybrid_search(
         vector_score = float(row[5])
 
         bm25_score = score_map.get(
-            chunk_text,
+            chunk_id,
             0.0
         )
 
@@ -226,6 +228,54 @@ def hybrid_search(
                 float(final_score)
         })
 
+    seen_chunk_ids = {
+        result["chunk_id"]
+        for result in combined_results
+    }
+
+    bm25_ranked_rows = sorted(
+        zip(all_chunks, bm25_scores),
+        key=lambda row_score: row_score[1],
+        reverse=True
+    )
+
+    for row, bm25_score in bm25_ranked_rows[:10]:
+        chunk_id = row[0]
+
+        if chunk_id in seen_chunk_ids:
+            continue
+
+        combined_results.append({
+
+            "chunk_id":
+                chunk_id,
+
+            "document_id":
+                row[1],
+
+            "chunk_text":
+                row[2],
+
+            "page_number":
+                row[3],
+
+            "filename":
+                row[4],
+
+            "vector_score":
+                0.0,
+
+            "bm25_score":
+                float(bm25_score),
+
+            "final_score":
+                0.3 * float(bm25_score)
+        })
+
+        seen_chunk_ids.add(
+            chunk_id
+        )
+
     # =========================
     # HYBRID SORT
     # =========================
@@ -235,47 +285,10 @@ def hybrid_search(
         reverse=True
     )
 
-    # =========================
-    # RERANK
-    # =========================
-
-    pairs = [
-
-        (
-            query,
-            result["chunk_text"]
-        )
-
-        for result in combined_results
-    ]
-
-    if pairs:
-
-        print("Starting reranking", flush=True)
-        stage_start = time.time()
-
-        rerank_scores = reranker.predict(
-            pairs
-        )
-
-        log_timing("Reranking", stage_start)
-
-        for i in range(
-            len(combined_results)
-        ):
-
-            combined_results[i][
-                "rerank_score"
-            ] = float(
-                rerank_scores[i]
-            )
-
-        combined_results.sort(
-            key=lambda x: x[
-                "rerank_score"
-            ],
-            reverse=True
-        )
+    for result in combined_results:
+        result["rerank_score"] = result[
+            "final_score"
+        ]
 
     # =========================
     # REMOVE DUPLICATES
