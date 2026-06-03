@@ -5,6 +5,9 @@
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL%20%2B%20pgvector-blue?style=flat-svg&logo=postgresql)](https://www.postgresql.org/)
 [![Supabase](https://img.shields.io/badge/Cloud%20Database-Supabase-3ecf8e?style=flat-svg&logo=supabase)](https://supabase.com/)
 [![Groq](https://img.shields.io/badge/Inference%20Engine-Groq%20Llama%203.3-orange?style=flat-svg)](https://groq.com/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Active-brightgreen?style=flat-svg)](https://contextiq-frontend.onrender.com/)
+
+🚀 **[Live Demo](https://contextiq-frontend.onrender.com/)**
 
 ContextIQ is a production-grade, secure, multi-tenant **Retrieval-Augmented Generation (RAG)** platform engineered for blazing-fast document ingestion, ownership-aware hybrid retrieval, and AI-powered question answering.
 
