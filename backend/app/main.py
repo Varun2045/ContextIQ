@@ -45,15 +45,15 @@ from app.services.generation_service import (
 from app.metrics import metrics
 
 app = FastAPI(
-    title="Retrievium"
+    title="ContextIQ"
 )
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        "https://retrievium-at2q.vercel.app",
-        "https://retrievium-at2q-git-main-neha-damani-s-projects.vercel.app",
+        "https://contextiq-at2q.vercel.app",
+        "https://contextiq-at2q-git-main-neha-damani-s-projects.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -114,7 +114,7 @@ async def root():
 
     return {
         "message":
-        "Retrievium API running"
+        "ContextIQ API running"
     }
 
 
@@ -312,6 +312,80 @@ async def login(user: UserLogin):
         "access_token": token,
         "token_type": "bearer"
     }
+class GoogleLogin(BaseModel):
+    email: str
+    name: str
+
+
+@app.post("/login/google")
+async def login_google(user_info: GoogleLogin):
+    try:
+        cur.execute(
+            """
+            SELECT
+                id,
+                name,
+                email,
+                password_hash,
+                created_at
+            FROM users
+            WHERE email = %s
+            """,
+            (
+                user_info.email,
+            )
+        )
+        existing_user = cur.fetchone()
+    except psycopg2.Error:
+        conn.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail="Database query failed"
+        )
+
+    if not existing_user:
+        # Create a new user with a random secure password hash
+        hashed_password = hash_password(str(uuid.uuid4()))
+        try:
+            cur.execute(
+                """
+                INSERT INTO users (
+                    name,
+                    email,
+                    password_hash
+                )
+                VALUES (%s, %s, %s)
+                RETURNING id, name, email, created_at
+                """,
+                (
+                    user_info.name,
+                    user_info.email,
+                    hashed_password
+                )
+            )
+            created_user = cur.fetchone()
+            conn.commit()
+            user_data = created_user
+        except psycopg2.Error:
+            conn.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail="Could not create Google user"
+            )
+    else:
+        user_data = existing_user
+
+    token = create_access_token(
+        {
+            "sub": user_data[2]
+        }
+    )
+
+    return {
+        "access_token": token,
+        "token_type": "bearer"
+    }
+
 
 
 @app.post("/upload")

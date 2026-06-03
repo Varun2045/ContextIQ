@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, LockKeyhole, Mail, Sparkles } from "lucide-react";
+import { ArrowRight, LockKeyhole, Mail, Sparkles, Sun, Moon } from "lucide-react";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
@@ -15,6 +15,43 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      if (savedTheme === "light") {
+        document.documentElement.classList.add("light");
+      } else {
+        document.documentElement.classList.remove("light");
+      }
+    } else {
+      const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+      const defaultTheme = prefersLight ? "light" : "dark";
+      setTheme(defaultTheme);
+      if (defaultTheme === "light") {
+        document.documentElement.classList.add("light");
+      } else {
+        document.documentElement.classList.remove("light");
+      }
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    localStorage.setItem("theme", nextTheme);
+    if (nextTheme === "light") {
+      document.documentElement.classList.add("light");
+    } else {
+      document.documentElement.classList.remove("light");
+    }
+  };
+
+
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -78,18 +115,34 @@ export default function LoginPage() {
         }}
       />
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(99,102,241,0.18),transparent_28%),radial-gradient(circle_at_80%_10%,rgba(14,165,233,0.12),transparent_24%),linear-gradient(180deg,#08080C_0%,#0B0B13_100%)]" />
+      <div className="login-bg absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(99,102,241,0.18),transparent_28%),radial-gradient(circle_at_80%_10%,rgba(14,165,233,0.12),transparent_24%),linear-gradient(180deg,#08080C_0%,#0B0B13_100%)]" />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-400/50 to-transparent" />
+
+      {/* Floating Theme Toggle */}
+      <div className="absolute top-6 right-6 z-50">
+        <button
+          onClick={toggleTheme}
+          type="button"
+          className="p-2.5 rounded-xl border border-[#1B1B26] bg-[#0C0C14]/90 text-[#E4E4E7] hover:bg-[#12121E]/60 transition cursor-pointer flex items-center justify-center shadow-lg"
+          title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        >
+          {theme === "dark" ? (
+            <Sun className="h-4.5 w-4.5 text-amber-400" />
+          ) : (
+            <Moon className="h-4.5 w-4.5 text-indigo-500" />
+          )}
+        </button>
+      </div>
 
       <section className="relative z-10 w-full max-w-5xl grid lg:grid-cols-[1fr_420px] gap-8 items-center">
         <div className="hidden lg:block">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#242438] bg-[#0C0C14]/80 px-3 py-1.5 text-xs font-semibold text-zinc-400 mb-8">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#212133] bg-[#0C0C14]/90 px-3 py-1.5 text-xs font-semibold text-zinc-400 mb-8">
             <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
             Secure retrieval workspace
           </div>
 
           <h1 className="text-5xl font-extrabold tracking-tight text-white leading-tight max-w-xl">
-            Welcome back to Retrievium.
+            Welcome back to ContextIQ.
           </h1>
           <p className="mt-5 text-base leading-7 text-zinc-400 max-w-lg">
             Sign in to upload documents, query your indexed knowledge base, and monitor retrieval quality from the dashboard.
@@ -99,7 +152,7 @@ export default function LoginPage() {
             {["Hybrid Search", "Reranking", "Metrics"].map((item) => (
               <div
                 key={item}
-                className="border border-[#1B1B26] bg-[#0C0C14]/70 rounded-2xl px-4 py-4"
+                className="border border-[#1B1B26] bg-[#0C0C14]/90 rounded-2xl px-4 py-4"
               >
                 <div className="h-1.5 w-1.5 rounded-full bg-indigo-400 mb-3" />
                 <p className="text-xs font-bold text-zinc-300">{item}</p>
@@ -130,7 +183,7 @@ export default function LoginPage() {
             <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
               Email
             </span>
-            <div className="mt-2 flex items-center gap-3 rounded-xl border border-[#202033] bg-[#08080C] px-4 py-3 focus-within:border-indigo-500/70 transition">
+            <div className="mt-2 flex items-center gap-3 rounded-xl border border-[#212133] bg-[#101019] px-4 py-3 focus-within:border-indigo-500/70 transition">
               <Mail className="h-4 w-4 text-zinc-500" />
               <input
                 type="email"
@@ -147,7 +200,7 @@ export default function LoginPage() {
             <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
               Password
             </span>
-            <div className="mt-2 flex items-center gap-3 rounded-xl border border-[#202033] bg-[#08080C] px-4 py-3 focus-within:border-indigo-500/70 transition">
+            <div className="mt-2 flex items-center gap-3 rounded-xl border border-[#212133] bg-[#101019] px-4 py-3 focus-within:border-indigo-500/70 transition">
               <LockKeyhole className="h-4 w-4 text-zinc-500" />
               <input
                 type="password"
@@ -161,7 +214,7 @@ export default function LoginPage() {
           </label>
 
           {error && (
-            <p className="mt-5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+            <p className="mt-5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200 font-sans">
               {error}
             </p>
           )}
@@ -174,6 +227,8 @@ export default function LoginPage() {
             {!loading && <ArrowRight className="h-4 w-4" />}
           </button>
 
+
+
           <p className="mt-6 text-center text-sm text-zinc-500">
             New here?{" "}
             <Link
@@ -185,6 +240,8 @@ export default function LoginPage() {
           </p>
         </form>
       </section>
+
+
     </main>
   );
 }

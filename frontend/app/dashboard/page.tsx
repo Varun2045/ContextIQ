@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Sun, Moon } from "lucide-react";
 
 import {
   LineChart,
@@ -74,6 +75,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 
 export default function DashboardPage() {
   const [metrics, setMetrics] = useState<Metrics | null>(null);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const router = useRouter();
 
   useEffect(() => {
@@ -90,6 +92,38 @@ export default function DashboardPage() {
       .then((data) => setMetrics(data))
       .catch((err) => console.error(err));
   }, []);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      if (savedTheme === "light") {
+        document.documentElement.classList.add("light");
+      } else {
+        document.documentElement.classList.remove("light");
+      }
+    } else {
+      const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+      const defaultTheme = prefersLight ? "light" : "dark";
+      setTheme(defaultTheme);
+      if (defaultTheme === "light") {
+        document.documentElement.classList.add("light");
+      } else {
+        document.documentElement.classList.remove("light");
+      }
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    localStorage.setItem("theme", nextTheme);
+    if (nextTheme === "light") {
+      document.documentElement.classList.add("light");
+    } else {
+      document.documentElement.classList.remove("light");
+    }
+  };
 
   if (!metrics) {
     return (
@@ -217,25 +251,36 @@ export default function DashboardPage() {
             </h1>
           </div>
 
-          <Link
-            href="/"
-            className="flex items-center gap-2 bg-[#12121E] border border-[#202030] text-zinc-300 hover:text-white px-5 py-3 rounded-xl font-semibold text-xs transition duration-200 active:scale-95 shadow-lg shadow-black/10"
-          >
-            <svg
-              className="w-3.5 h-3.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2.5}
+          <div className="flex items-center gap-3">
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="flex items-center justify-center bg-[#12121E] border border-[#202030] text-zinc-300 hover:text-white p-3 rounded-xl transition duration-200 active:scale-95 shadow-lg shadow-black/10"
+              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            <span>Back to Chat</span>
-          </Link>
+              {theme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
+            </button>
+
+            <Link
+              href="/"
+              className="flex items-center gap-2 bg-[#12121E] border border-[#202030] text-zinc-300 hover:text-white px-5 py-3 rounded-xl font-semibold text-xs transition duration-200 active:scale-95 shadow-lg shadow-black/10"
+            >
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              <span>Back to Chat</span>
+            </Link>
+          </div>
         </div>
 
         {/* METRICS METADATA GRID */}
@@ -561,20 +606,20 @@ export default function DashboardPage() {
                 margin={{ top: 5, right: 5, left: -25, bottom: 5 }}
               >
                 <CartesianGrid
-                  stroke="#161623"
+                  stroke="var(--chart-grid)"
                   strokeDasharray="3 3"
                   vertical={false}
                 />
                 <XAxis
                   dataKey="index"
-                  stroke="#52525B"
+                  stroke="var(--chart-axis)"
                   fontSize={10}
                   tickLine={false}
                   axisLine={false}
                   dy={10}
                 />
                 <YAxis
-                  stroke="#52525B"
+                  stroke="var(--chart-axis)"
                   fontSize={10}
                   tickLine={false}
                   axisLine={false}
@@ -614,20 +659,20 @@ export default function DashboardPage() {
                 margin={{ top: 5, right: 5, left: -25, bottom: 5 }}
               >
                 <CartesianGrid
-                  stroke="#161623"
+                  stroke="var(--chart-grid)"
                   strokeDasharray="3 3"
                   vertical={false}
                 />
                 <XAxis
                   dataKey="index"
-                  stroke="#52525B"
+                  stroke="var(--chart-axis)"
                   fontSize={10}
                   tickLine={false}
                   axisLine={false}
                   dy={10}
                 />
                 <YAxis
-                  stroke="#52525B"
+                  stroke="var(--chart-axis)"
                   fontSize={10}
                   tickLine={false}
                   axisLine={false}
@@ -667,20 +712,20 @@ export default function DashboardPage() {
                 margin={{ top: 5, right: 5, left: -25, bottom: 5 }}
               >
                 <CartesianGrid
-                  stroke="#161623"
+                  stroke="var(--chart-grid)"
                   strokeDasharray="3 3"
                   vertical={false}
                 />
                 <XAxis
                   dataKey="index"
-                  stroke="#52525B"
+                  stroke="var(--chart-axis)"
                   fontSize={10}
                   tickLine={false}
                   axisLine={false}
                   dy={10}
                 />
                 <YAxis
-                  stroke="#52525B"
+                  stroke="var(--chart-axis)"
                   fontSize={10}
                   tickLine={false}
                   axisLine={false}
@@ -720,20 +765,20 @@ export default function DashboardPage() {
                 margin={{ top: 5, right: 5, left: -25, bottom: 5 }}
               >
                 <CartesianGrid
-                  stroke="#161623"
+                  stroke="var(--chart-grid)"
                   strokeDasharray="3 3"
                   vertical={false}
                 />
                 <XAxis
                   dataKey="index"
-                  stroke="#52525B"
+                  stroke="var(--chart-axis)"
                   fontSize={10}
                   tickLine={false}
                   axisLine={false}
                   dy={10}
                 />
                 <YAxis
-                  stroke="#52525B"
+                  stroke="var(--chart-axis)"
                   fontSize={10}
                   tickLine={false}
                   axisLine={false}

@@ -39,12 +39,11 @@ Rules:
 
 "I do not know based on the provided context."
 
-6. Be concise, accurate, and grounded in the retrieved content.
+6. Be concise, accurate, and grounded in the retrieved content. Format your answer using structured paragraphs for explanations, and clear bullet points or numbered lists when listing items, key steps, or details to ensure high readability.
 
-7. Always cite sources using:
-(Filename, Page Number)
+7. Do NOT include inline citations (such as page numbers, file names, or parenthetical references) directly inside the body of your response text. Keep the body text clean and easy to read.
 
-8. If multiple sources support the answer, cite all relevant sources.
+8. The source metadata will be appended automatically at the end of the stream, so you do not need to format any sources yourself.
 
 9. Never claim certainty about information that is not explicitly supported by the context.
 """
@@ -81,7 +80,7 @@ Content:
 
     sources = []
 
-    for chunk in retrieved_chunks[:2]:
+    for chunk in retrieved_chunks:
 
         source = (
             f"({chunk['filename']}, "

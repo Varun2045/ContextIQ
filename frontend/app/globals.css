@@ -1,8 +1,45 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #08080C;
+  --foreground: #E4E4E7;
+  
+  --bg-main: #08080C;
+  --bg-sidebar: #0C0C14;
+  --bg-card: rgba(12, 12, 20, 0.9);
+  --bg-card-solid: #12121E;
+  --bg-input: #101019;
+  --border-color: #1B1B26;
+  --border-color-light: #212130;
+  --border-color-accent: #2e2e44;
+  
+  --text-main: #E4E4E7;
+  --text-muted: #a1a1aa;
+  --text-dark: #fafafa;
+
+  --chart-grid: #161623;
+  --chart-axis: #52525B;
+}
+
+html.light {
+  --background: #F8F9FA;
+  --foreground: #1A1A1E;
+
+  --bg-main: #F8F9FA;
+  --bg-sidebar: #FFFFFF;
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --bg-card-solid: #F1F3F5;
+  --bg-input: #FFFFFF;
+  --border-color: #E9ECEF;
+  --border-color-light: #DEE2E6;
+  --border-color-accent: #CED4DA;
+  
+  --text-main: #212529;
+  --text-muted: #495057;
+  --text-dark: #212529;
+
+  --chart-grid: #E9ECEF;
+  --chart-axis: #6C757D;
 }
 
 @theme inline {
@@ -12,15 +49,419 @@
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ==========================================================================
+   CLASS OVERRIDES FOR LIGHT THEME
+   ========================================================================== */
+
+/* Main background overrides */
+html.light .bg-\[\#08080C\] {
+  background-color: var(--bg-main) !important;
+}
+html.light .bg-\[\#08080C\]\/40 {
+  background-color: rgba(248, 249, 250, 0.4) !important;
+}
+html.light .bg-\[\#08080C\]\/80 {
+  background-color: rgba(248, 249, 250, 0.8) !important;
+}
+
+/* Sidebar overrides */
+html.light .bg-\[\#0C0C14\]\/90 {
+  background-color: var(--bg-card) !important;
+}
+html.light .bg-\[\#0C0C14\] {
+  background-color: var(--bg-sidebar) !important;
+}
+
+/* Card & setting box overrides */
+html.light .bg-\[\#12121E\] {
+  background-color: var(--bg-card-solid) !important;
+}
+html.light .bg-\[\#12121F\]\/80 {
+  background-color: var(--bg-card-solid) !important;
+}
+html.light .bg-\[\#12121F\] {
+  background-color: var(--bg-card-solid) !important;
+}
+html.light .bg-\[\#101019\] {
+  background-color: var(--bg-input) !important;
+}
+html.light .bg-\[\#0E0E16\]\/80 {
+  background-color: var(--bg-card) !important;
+}
+html.light .bg-\[\#0E0E16\]\/50 {
+  background-color: var(--bg-card) !important;
+}
+html.light .bg-\[\#0E0E17\]\/60 {
+  background-color: var(--bg-card) !important;
+}
+html.light .bg-\[\#1A1A2F\]\/90 {
+  background-color: var(--bg-card-solid) !important;
+  color: var(--text-main) !important;
+}
+html.light .bg-\[\#151522\] {
+  background-color: var(--bg-card-solid) !important;
+}
+html.light .bg-\[\#11111B\] {
+  background-color: var(--bg-sidebar) !important;
+}
+
+/* Borders */
+html.light .border-\[\#1B1B26\] {
+  border-color: var(--border-color) !important;
+}
+html.light .border-\[\#212130\] {
+  border-color: var(--border-color-light) !important;
+}
+html.light .border-\[\#212133\] {
+  border-color: var(--border-color-light) !important;
+}
+html.light .border-\[\#20202F\] {
+  border-color: var(--border-color-light) !important;
+}
+html.light .border-\[\#20202F\]\/80 {
+  border-color: var(--border-color-light) !important;
+}
+html.light .border-\[\#202030\] {
+  border-color: var(--border-color-light) !important;
+}
+html.light .border-\[\#232335\] {
+  border-color: var(--border-color-light) !important;
+}
+html.light .border-\[\#2A2A3E\] {
+  border-color: var(--border-color-light) !important;
+}
+html.light .border-\[\#14141E\] {
+  border-color: var(--border-color) !important;
+}
+html.light .border-\[\#161623\] {
+  border-color: var(--border-color) !important;
+}
+html.light .border-\[\#191928\] {
+  border-color: var(--border-color-light) !important;
+}
+html.light .border-\[\#1A1A2A\] {
+  border-color: var(--border-color-light) !important;
+}
+html.light .border-\[\#2E2E44\] {
+  border-color: var(--border-color-accent) !important;
+}
+html.light .border-indigo-500\/20 {
+  border-color: rgba(99, 102, 241, 0.4) !important;
+}
+
+/* Hover background changes */
+html.light .hover\:bg-\[\#12121E\]:hover {
+  background-color: var(--bg-card-solid) !important;
+}
+html.light .hover\:bg-\[\#12121E\]\/60:hover {
+  background-color: var(--bg-card-solid) !important;
+}
+html.light .hover\:bg-\[\#161626\]:hover {
+  background-color: var(--bg-card-solid) !important;
+}
+
+/* Text color overrides for high contrast in light mode */
+html.light .text-\[\#E4E4E7\] {
+  color: var(--text-main) !important;
+}
+html.light .text-zinc-100 {
+  color: #1A1A1E !important;
+}
+html.light .text-zinc-200 {
+  color: #212529 !important;
+}
+html.light .text-zinc-300 {
+  color: #343A40 !important;
+}
+html.light .text-zinc-400 {
+  color: #495057 !important;
+}
+html.light .text-zinc-500 {
+  color: #6C757D !important;
+}
+html.light .text-zinc-600 {
+  color: #868E96 !important;
+}
+
+html.light h2.text-white, 
+html.light h3.text-white, 
+html.light h4.text-white, 
+html.light span.text-white,
+html.light p.text-zinc-200,
+html.light div.text-zinc-200 {
+  color: var(--text-main) !important;
+}
+
+/* Specific main title overrides */
+html.light h1.text-white,
+html.light h2.text-white.tracking-tight {
+  color: #1A1A1E !important;
+}
+
+/* Exclude active buttons, gradients, icons from getting dark text */
+html.light .text-white:not(button):not(a):not(span.bg-gradient-to-tr *):not(.bg-indigo-600 *):not(.bg-gradient-to-r *):not(.p-2 *) {
+  color: #1A1A1E !important;
+}
+
+/* Re-color brand gradients in light mode to dark shades */
+html.light .from-white {
+  --tw-gradient-from: #1A1A1E var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: #495057 var(--tw-gradient-to-position) !important;
+}
+
+/* Re-color status alerts & active indicators */
+html.light .text-indigo-400 {
+  color: #4F46E5 !important;
+}
+html.light .text-emerald-400 {
+  color: #059669 !important;
+}
+
+/* Input placeholder text visibility */
+html.light .placeholder-zinc-500::placeholder {
+  color: #6C757D !important;
+  opacity: 1 !important;
+}
+
+/* Logout button corrections in light theme */
+html.light .text-rose-100 {
+  color: #E03131 !important;
+}
+html.light .bg-rose-500\/10 {
+  background-color: #FFE3E3 !important;
+}
+html.light .border-rose-500\/30 {
+  border-color: #FFA8A8 !important;
+}
+html.light button.group:hover .text-rose-100 {
+  color: #FFFFFF !important;
+}
+
+/* Disabled Search button corrections */
+html.light .bg-\[\#181827\] {
+  background-color: #E9ECEF !important;
+}
+html.light .border-\[\#252538\] {
+  border-color: #CED4DA !important;
+}
+
+/* Scrollbar tweaks */
+html.light .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15) !important;
+}
+html.light .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Soft blur adjustments */
+html.light .bg-indigo-600\/5 {
+  background-color: rgba(99, 102, 241, 0.08) !important;
+}
+html.light .bg-violet-600\/5 {
+  background-color: rgba(139, 92, 246, 0.08) !important;
+}
+
+/* Login/Signup page overrides in light mode */
+html.light .bg-\[\#0C0C14\]\/70 {
+  background-color: var(--bg-card) !important;
+}
+html.light button.bg-white {
+  background-color: #1A1A1E !important;
+  color: #FFFFFF !important;
+}
+html.light button.bg-white:hover {
+  background-color: #27272A !important;
+}
+
+/* Custom theme logo elements to avoid tailwind dark media query clashes */
+.logo-gradient {
+  background-image: linear-gradient(to right, #FFFFFF, #E4E4E7, #A1A1AA) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+html.light .logo-gradient {
+  background-image: linear-gradient(to right, #1A1A1E, #495057, #6C757D) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+.mobile-logo {
+  color: #FFFFFF !important;
+}
+
+html.light .mobile-logo {
+  color: #1A1A1E !important;
+}
+
+/* Login and Signup specific theme overrides */
+html.light .login-bg {
+  background: radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.08), transparent 35%),
+              radial-gradient(circle at 80% 10%, rgba(14, 165, 233, 0.06), transparent 30%),
+              linear-gradient(180deg, #F8F9FA 0%, #E9ECEF 100%) !important;
+}
+
+html.light .signup-bg {
+  background: radial-gradient(circle at 18% 14%, rgba(14, 165, 233, 0.08), transparent 35%),
+              radial-gradient(circle at 80% 26%, rgba(99, 102, 241, 0.08), transparent 30%),
+              linear-gradient(180deg, #F8F9FA 0%, #E9ECEF 100%) !important;
+}
+
+html.light .bg-\[\#0C0C14\]\/90 {
+  background-color: var(--bg-card) !important;
+}
+
+html.light .shadow-black\/40 {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02) !important;
+}
+
+html.light .text-indigo-300 {
+  color: #4F46E5 !important;
+}
+
+html.light .text-sky-300 {
+  color: #0284C7 !important;
+}
+
+html.light .bg-indigo-400 {
+  background-color: #4F46E5 !important;
+}
+
+html.light .bg-sky-400 {
+  background-color: #0284C7 !important;
+}
+
+html.light a.hover\:text-white:hover {
+  color: #1E1B4B !important;
+}
+
+html.light .bg-gradient-to-tr * {
+  color: #FFFFFF !important;
+}
+
+/* ChatGPT Auth layout overrides */
+html.light .chatgpt-card {
+  background-color: #FFFFFF !important;
+  border-color: #E4E4E7 !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.03), 0 10px 10px -5px rgba(0, 0, 0, 0.01) !important;
+}
+
+html.light .chatgpt-card h1 {
+  color: #09090B !important;
+}
+
+html.light .chatgpt-card p {
+  color: #71717A !important;
+}
+
+html.light .social-btn {
+  background-color: #FFFFFF !important;
+  border-color: #E4E4E7 !important;
+  color: #09090B !important;
+}
+
+html.light .social-btn:hover {
+  background-color: #F4F4F5 !important;
+}
+
+html.light .divider-line {
+  border-color: #E4E4E7 !important;
+}
+
+html.light .divider-text {
+  background-color: #FFFFFF !important;
+  color: #A1A1AA !important;
+}
+
+html.light .form-input {
+  background-color: #F4F4F5 !important;
+  border-color: #D4D4D8 !important;
+  color: #09090B !important;
+}
+
+html.light .form-input:focus {
+  border-color: #71717A !important;
+}
+
+html.light .form-input::placeholder {
+  color: #A1A1AA !important;
+}
+
+html.light .submit-btn {
+  background-color: #09090B !important;
+  color: #FFFFFF !important;
+}
+
+html.light .submit-btn:hover {
+  background-color: #27272A !important;
+}
+
+html.light .footer-link-text {
+  color: #71717A !important;
+}
+
+html.light .footer-link-text a {
+  color: #09090B !important;
+}
+
+html.light .footer-link-text a:hover {
+  color: #27272A !important;
+}
+
+html.light .html-light-toggle {
+  background-color: #FFFFFF !important;
+  border-color: #E4E4E7 !important;
+  color: #09090B !important;
+}
+
+html.light .html-light-toggle:hover {
+  background-color: #F4F4F5 !important;
+}
+
+html.light .login-bg,
+html.light .signup-bg {
+  background: radial-gradient(circle at 50% 50%, rgba(244, 244, 245, 0.5), #F4F4F5) !important;
+}
+
+/* ==========================================================================
+   GOOGLE ACCOUNTS MODAL OVERRIDES FOR LIGHT THEME
+   ========================================================================== */
+html.light .bg-\[\#0F0E13\] {
+  background-color: #FFFFFF !important;
+}
+html.light .bg-\[\#0B0A0E\] {
+  background-color: #F8F9FA !important;
+}
+html.light .bg-\[\#16151B\] {
+  background-color: #F1F3F5 !important;
+}
+html.light .hover\:bg-\[\#16151B\]:hover {
+  background-color: #E9ECEF !important;
+}
+html.light .bg-\[\#1C1B22\] {
+  background-color: #F1F3F5 !important;
+}
+html.light .border-\[\#212133\] {
+  border-color: #E2E8F0 !important;
+}
+html.light .border-\[\#1B1B26\] {
+  border-color: #E2E8F0 !important;
+}
+html.light .border-\[\#2B2B38\] {
+  border-color: #CBD5E1 !important;
+}
+html.light .divide-\[\#1B1B26\] > :not([hidden]) ~ :not([hidden]) {
+  border-color: #E2E8F0 !important;
+}
+
+
+
+

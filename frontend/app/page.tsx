@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { LogOut, Sun, Moon } from "lucide-react";
 
 interface Toast {
   type: "success" | "error" | "info";
@@ -41,6 +41,7 @@ export default function HomePage() {
   const [toast, setToast] = useState<Toast | null>(null);
   const [copied, setCopied] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -53,6 +54,38 @@ export default function HomePage() {
       router.push("/login");
     }
   }, [router]);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      if (savedTheme === "light") {
+        document.documentElement.classList.add("light");
+      } else {
+        document.documentElement.classList.remove("light");
+      }
+    } else {
+      const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+      const defaultTheme = prefersLight ? "light" : "dark";
+      setTheme(defaultTheme);
+      if (defaultTheme === "light") {
+        document.documentElement.classList.add("light");
+      } else {
+        document.documentElement.classList.remove("light");
+      }
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    localStorage.setItem("theme", nextTheme);
+    if (nextTheme === "light") {
+      document.documentElement.classList.add("light");
+    } else {
+      document.documentElement.classList.remove("light");
+    }
+  };
 
   // Helper: Display dynamic custom toast notification
   const showToast = (message: string, type: Toast["type"] = "success") => {
@@ -116,7 +149,8 @@ export default function HomePage() {
 
       if (!token) {
         router.push("/login");
-        throw new Error("Please log in before uploading a document.");
+        showToast("Please log in before uploading a document.", "error");
+        return;
       }
 
       const response = await fetch(`${API_URL}/upload`, {
@@ -128,19 +162,25 @@ export default function HomePage() {
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          localStorage.removeItem("token");
+          router.push("/login");
+          showToast("Session expired or user deleted. Please log in again.", "error");
+          return;
+        }
+
         const errorText = await getErrorMessage(
           response,
           "Document indexing failed. Verify backend server."
         );
 
-        throw new Error(
-          `Upload failed (${response.status}): ${errorText}`
-        );
+        showToast(`Upload failed (${response.status}): ${errorText}`, "error");
+        return;
       }
 
       showToast("Document uploaded and indexed successfully", "success");
     } catch (error) {
-      console.error(error);
+      console.warn(error);
       showToast(
         error instanceof Error
           ? error.message
@@ -165,7 +205,8 @@ export default function HomePage() {
 
       if (!token) {
         router.push("/login");
-        throw new Error("Please log in before querying documents.");
+        showToast("Please log in before querying documents.", "error");
+        return;
       }
 
       const response = await fetch(`${API_URL}/query`, {
@@ -180,14 +221,20 @@ export default function HomePage() {
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          localStorage.removeItem("token");
+          router.push("/login");
+          showToast("Session expired or user deleted. Please log in again.", "error");
+          return;
+        }
+
         const errorText = await getErrorMessage(
           response,
           "Retrieval query failed. Verify backend status."
         );
 
-        throw new Error(
-          `Query failed (${response.status}): ${errorText}`
-        );
+        showToast(`Query failed (${response.status}): ${errorText}`, "error");
+        return;
       }
 
       const reader = response.body?.getReader();
@@ -201,7 +248,7 @@ export default function HomePage() {
         setAnswer((prev) => prev + chunk);
       }
     } catch (error) {
-      console.error(error);
+      console.warn(error);
       showToast(
         error instanceof Error
           ? error.message
@@ -300,30 +347,41 @@ export default function HomePage() {
       <aside className="hidden md:flex w-80 border-r border-[#1B1B26] bg-[#0C0C14]/90 backdrop-blur-xl p-6 flex-col justify-between z-10 shrink-0">
         <div>
           {/* Brand Header */}
-          <div className="flex items-center gap-3 mb-8 relative">
-            <div className="p-2 bg-gradient-to-tr from-violet-600 to-indigo-600 rounded-xl shadow-lg shadow-indigo-500/20">
-              <svg
-                className="w-6 h-6 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                />
-              </svg>
+          <div className="flex items-center justify-between mb-8 relative">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-tr from-violet-600 to-indigo-600 rounded-xl shadow-lg shadow-indigo-500/20">
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold logo-gradient tracking-tight">
+                  ContextIQ
+                </h1>
+                <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-wider">
+                  Enterprise RAG
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent tracking-tight">
-                Retrievium
-              </h1>
-              <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-wider">
-                Enterprise RAG
-              </p>
-            </div>
+
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="p-2.5 bg-[#12121E] border border-[#212130] rounded-xl text-zinc-400 hover:text-white transition duration-200 shadow-md active:scale-95"
+              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {theme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
+            </button>
           </div>
 
           {/* System Status Metrics Card */}
@@ -401,7 +459,9 @@ export default function HomePage() {
                   disabled={loading}
                   className={`w-full py-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition duration-200 ${
                     loading
-                      ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+                      ? theme === "light"
+                        ? "bg-zinc-200 text-zinc-500 cursor-not-allowed border border-zinc-300"
+                        : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
                       : "bg-[#E4E4E7] text-black hover:bg-white active:scale-95 shadow-md shadow-white/5"
                   }`}
                 >
@@ -579,14 +639,6 @@ export default function HomePage() {
             Logout
           </button>
 
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium tracking-wide">
-              Enterprise Secure Cloud
-            </p>
-            <span className="text-[10px] bg-[#12121F] border border-[#20202F] px-2 py-0.5 rounded-full text-zinc-400 font-mono">
-              v1.2.8
-            </span>
-          </div>
         </div>
       </aside>
 
@@ -608,13 +660,22 @@ export default function HomePage() {
               />
             </svg>
           </div>
-          <span className="text-sm font-bold text-white tracking-tight">
-            Retrievium
+          <span className="text-sm font-bold mobile-logo tracking-tight">
+            ContextIQ
           </span>
         </div>
 
         {/* Simple File Input Toggle on Mobile Header */}
         <div className="flex items-center gap-2">
+          {/* Mobile Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="p-2 bg-[#12121E] border border-[#212130] rounded-xl text-zinc-400 hover:text-white transition duration-200 active:scale-95"
+            title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          >
+            {theme === "dark" ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-indigo-400" />}
+          </button>
+
           <label className="cursor-pointer bg-[#12121E] border border-[#212130] px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 text-zinc-300">
             <svg
               className="w-3.5 h-3.5"
@@ -699,7 +760,7 @@ export default function HomePage() {
                   </h2>
                   <p className="text-zinc-400 text-base md:text-lg leading-relaxed font-light">
                     Upload critical PDF document corpuses, then query details
-                    instantly. Retrievium matches vector databases directly to
+                    instantly. ContextIQ matches vector databases directly to
                     formulate structured answers.
                   </p>
                 </div>
@@ -997,9 +1058,18 @@ export default function HomePage() {
                   Response will be verified against referenced documents.
                 </span>
               </div>
-              <span className="hidden sm:inline">
-                Press <strong>Enter</strong> to send
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline">
+                  Press <strong>Enter</strong> to send
+                </span>
+                <span className="w-px h-3 bg-zinc-700/30 hidden sm:inline" />
+                <span className="font-semibold tracking-wide">
+                  Enterprise Secure Cloud
+                </span>
+                <span className="bg-[#12121F] border border-[#20202F]/80 px-2 py-0.5 rounded-full text-zinc-400 font-mono text-[9px]">
+                  v1.2.8
+                </span>
+              </div>
             </div>
           </div>
         </div>

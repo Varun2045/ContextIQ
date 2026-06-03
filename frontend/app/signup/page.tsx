@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Mail, ShieldCheck, UserRound, LockKeyhole } from "lucide-react";
+import { ArrowRight, Mail, ShieldCheck, UserRound, LockKeyhole, Sun, Moon } from "lucide-react";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
@@ -16,6 +16,43 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      if (savedTheme === "light") {
+        document.documentElement.classList.add("light");
+      } else {
+        document.documentElement.classList.remove("light");
+      }
+    } else {
+      const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+      const defaultTheme = prefersLight ? "light" : "dark";
+      setTheme(defaultTheme);
+      if (defaultTheme === "light") {
+        document.documentElement.classList.add("light");
+      } else {
+        document.documentElement.classList.remove("light");
+      }
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    localStorage.setItem("theme", nextTheme);
+    if (nextTheme === "light") {
+      document.documentElement.classList.add("light");
+    } else {
+      document.documentElement.classList.remove("light");
+    }
+  };
+
+
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
@@ -67,8 +104,24 @@ export default function SignupPage() {
         }}
       />
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_14%,rgba(14,165,233,0.16),transparent_28%),radial-gradient(circle_at_80%_26%,rgba(99,102,241,0.16),transparent_26%),linear-gradient(180deg,#08080C_0%,#0B0B13_100%)]" />
+      <div className="signup-bg absolute inset-0 bg-[radial-gradient(circle_at_18%_14%,rgba(14,165,233,0.16),transparent_28%),radial-gradient(circle_at_80%_26%,rgba(99,102,241,0.16),transparent_26%),linear-gradient(180deg,#08080C_0%,#0B0B13_100%)]" />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-400/50 to-transparent" />
+
+      {/* Floating Theme Toggle */}
+      <div className="absolute top-6 right-6 z-50">
+        <button
+          onClick={toggleTheme}
+          type="button"
+          className="p-2.5 rounded-xl border border-[#1B1B26] bg-[#0C0C14]/90 text-[#E4E4E7] hover:bg-[#12121E]/60 transition cursor-pointer flex items-center justify-center shadow-lg"
+          title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        >
+          {theme === "dark" ? (
+            <Sun className="h-4.5 w-4.5 text-amber-400" />
+          ) : (
+            <Moon className="h-4.5 w-4.5 text-indigo-500" />
+          )}
+        </button>
+      </div>
 
       <section className="relative z-10 w-full max-w-5xl grid lg:grid-cols-[420px_1fr] gap-8 items-center">
         <form
@@ -93,7 +146,7 @@ export default function SignupPage() {
             <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
               Name
             </span>
-            <div className="mt-2 flex items-center gap-3 rounded-xl border border-[#202033] bg-[#08080C] px-4 py-3 focus-within:border-sky-500/70 transition">
+            <div className="mt-2 flex items-center gap-3 rounded-xl border border-[#212133] bg-[#101019] px-4 py-3 focus-within:border-sky-500/70 transition">
               <UserRound className="h-4 w-4 text-zinc-500" />
               <input
                 placeholder="Your name"
@@ -109,7 +162,7 @@ export default function SignupPage() {
             <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
               Email
             </span>
-            <div className="mt-2 flex items-center gap-3 rounded-xl border border-[#202033] bg-[#08080C] px-4 py-3 focus-within:border-sky-500/70 transition">
+            <div className="mt-2 flex items-center gap-3 rounded-xl border border-[#212133] bg-[#101019] px-4 py-3 focus-within:border-sky-500/70 transition">
               <Mail className="h-4 w-4 text-zinc-500" />
               <input
                 type="email"
@@ -126,7 +179,7 @@ export default function SignupPage() {
             <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
               Password
             </span>
-            <div className="mt-2 flex items-center gap-3 rounded-xl border border-[#202033] bg-[#08080C] px-4 py-3 focus-within:border-sky-500/70 transition">
+            <div className="mt-2 flex items-center gap-3 rounded-xl border border-[#212133] bg-[#101019] px-4 py-3 focus-within:border-sky-500/70 transition">
               <LockKeyhole className="h-4 w-4 text-zinc-500" />
               <input
                 type="password"
@@ -153,6 +206,8 @@ export default function SignupPage() {
             {!loading && <ArrowRight className="h-4 w-4" />}
           </button>
 
+
+
           <p className="mt-6 text-center text-sm text-zinc-500">
             Already have access?{" "}
             <Link
@@ -165,9 +220,9 @@ export default function SignupPage() {
         </form>
 
         <div className="hidden lg:block">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#242438] bg-[#0C0C14]/80 px-3 py-1.5 text-xs font-semibold text-zinc-400 mb-8">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#212133] bg-[#0C0C14]/90 px-3 py-1.5 text-xs font-semibold text-zinc-400 mb-8">
             <ShieldCheck className="h-3.5 w-3.5 text-sky-400" />
-            PostgreSQL protected accounts
+            Supabase protected accounts
           </div>
 
           <h2 className="text-5xl font-extrabold tracking-tight text-white leading-tight max-w-xl">
@@ -177,7 +232,7 @@ export default function SignupPage() {
             Create an account, upload your PDFs, and evaluate retrieval quality through the same dashboard used for latency, tokens, and ranking metrics.
           </p>
 
-          <div className="mt-10 border border-[#1B1B26] bg-[#0C0C14]/70 rounded-2xl p-5 max-w-xl">
+          <div className="mt-10 border border-[#1B1B26] bg-[#0C0C14]/90 rounded-2xl p-5 max-w-xl">
             <div className="grid grid-cols-3 gap-3">
               {["Auth", "Upload", "Retrieve"].map((item, index) => (
                 <div key={item}>
@@ -193,6 +248,8 @@ export default function SignupPage() {
           </div>
         </div>
       </section>
+
+
     </main>
   );
 }
