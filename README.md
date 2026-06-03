@@ -7,7 +7,7 @@
 [![Groq](https://img.shields.io/badge/Inference%20Engine-Groq%20Llama%203.3-orange?style=flat-svg)](https://groq.com/)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Active-brightgreen?style=flat-svg)](https://contextiq-frontend.onrender.com/)
 
-🚀 **[Live Demo](https://contextiq-frontend.onrender.com/)**
+🚀 **Live Demo: https://contextiq-frontend.onrender.com/**
 
 ContextIQ is a production-grade, secure, multi-tenant **Retrieval-Augmented Generation (RAG)** platform engineered for blazing-fast document ingestion, ownership-aware hybrid retrieval, and AI-powered question answering.
 
