@@ -228,7 +228,7 @@ CREATE TABLE IF NOT EXISTS chunks (
 
 ## 👤 Author
 
-**Neha Damani** - *Software Engineering & AI Architect*
+**Varun Damani** - *Software Engineering & AI Architect*
 
 ---
 
