@@ -55,6 +55,7 @@ app.add_middleware(
         "https://contextiq-at2q.vercel.app",
         "https://contextiq-at2q-git-main-neha-damani-s-projects.vercel.app",
     ],
+    allow_origin_regex="https://.*\\.onrender\\.com",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
